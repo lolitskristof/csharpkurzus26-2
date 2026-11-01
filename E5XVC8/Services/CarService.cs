@@ -33,4 +33,16 @@ public class CarService
 
         return car;
     }
+
+    public bool RemoveCar(int carId)
+    {
+        Car? car = _data.Cars.FirstOrDefault(car => car.Id == carId);
+
+        if (car is null) return false;
+
+        if (_data.Rentals.Any(rental => rental.CarId == carId && rental.ReturnedAt is null))
+            throw new InvalidOperationException("Kikölcsönzött autó nem törölhető");
+
+        return _data.Cars.Remove(car);
+    }
 }
