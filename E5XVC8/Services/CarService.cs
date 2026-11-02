@@ -1,8 +1,9 @@
 ﻿using E5XVC8.Models;
+using E5XVC8.Interfaces;
 
 namespace E5XVC8.Services;
 
-public class CarService
+public class CarService : ICarService
 {
     private readonly CarRentalData _data;
 
@@ -44,5 +45,17 @@ public class CarService
             throw new InvalidOperationException("Kikölcsönzött autó nem törölhető");
 
         return _data.Cars.Remove(car);
+    }
+
+    public List<Car> SearchCars(string searchTerm)
+    {
+        if (string.IsNullOrWhiteSpace(searchTerm)) throw new ArgumentException("A keresési kifejezés nem lehet üres");
+
+        return _data.Cars.Where(car => car.Brand.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) || car.Model.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)).ToList();
+    }
+
+    public List<Car> GetCarsSortedByYear()
+    {
+        return _data.Cars.OrderBy(car => car.Year).ToList();
     }
 }
