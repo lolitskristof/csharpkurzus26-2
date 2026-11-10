@@ -19,8 +19,15 @@ public class CarService : ICarService
         if (year < 1886 || year > DateTime.Now.Year + 1)
             throw new ArgumentException("Érvénytelen évjárat");
 
-        // A legnagyobb meglévő azonosító alapján generálunk új ID-t.
-        int nextId = _data.Cars.Count == 0 ? 1 : _data.Cars.Max(car => car.Id) + 1;
+        if (dailyPrice <= 0)
+            throw new ArgumentException("A napi díjnak pozitívnak kell lennie");
+
+        // A korábbi kölcsönzésekben szereplő autóazonosítókat sem használjuk fel újra.
+        int maxCarId = _data.Cars.Count == 0 ? 0 : _data.Cars.Max(car => car.Id);
+
+        int maxRentedCarId = _data.Rentals.Count == 0 ? 0 : _data.Rentals.Max(rental => rental.CarId);
+
+        int nextId = Math.Max(maxCarId, maxRentedCarId) + 1;
 
         Car car = new()
         {

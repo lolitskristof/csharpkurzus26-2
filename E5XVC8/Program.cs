@@ -15,8 +15,18 @@ internal class Program
 
         ICarRepository repository = new JsonCarRepository(filePath);
 
-        // Betöltjük az adatokat, majd átadjuk a service-eknek.
-        CarRentalData data = repository.Load();
+        // Betöltjük az adatokat, és kezeljük az esetleges fájlhibákat.
+        CarRentalData data;
+
+        try
+        {
+            data = repository.Load();
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+            Console.WriteLine($"Hiba az adatok betöltésekor: {ex.Message}");
+            return;
+        }
 
         ICarService carService = new CarService(data);
         IRentalService rentalService = new RentalService(data);
