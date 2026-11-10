@@ -55,6 +55,18 @@ public class ConsoleMenu
                 case 3:
                     ListCars();
                     break;
+                case 4:
+                    SearchCars();
+                    break;
+                case 5:
+                    SortCarsByYear();
+                    break;
+                case 6:
+                    RentCar();
+                    break;
+                case 7:
+                    ReturnCar();
+                    break;
 
                 default:
                     Console.WriteLine("A menüpont még nincs implementálva.");
@@ -113,5 +125,64 @@ public class ConsoleMenu
         {
             Console.WriteLine($"Hiba: {ex.Message}");
         }
+    }
+
+    private void SearchCars()
+    {
+        string searchTerm = InputHelper.ReadString("Keresés (márka vagy típus): ");
+
+        var cars = _carService.SearchCars(searchTerm);
+
+        if (cars.Count == 0)
+        {
+            Console.WriteLine("Nincs találat.");
+            return;
+        }
+
+        foreach (var car in cars)
+        {
+            Console.WriteLine($"{car.Id} - {car.Brand} {car.Model} " + $"({car.Year}) - {car.DailyPrice} Ft/nap");
+        }
+    }
+
+    private void SortCarsByYear()
+    {
+        var cars = _carService.GetCarsSortedByYear();
+
+        if (cars.Count == 0)
+        {
+            Console.WriteLine("Nincsenek autók a rendszerben.");
+            return;
+        }
+
+        foreach (var car in cars)
+        {
+            Console.WriteLine($"{car.Id} - {car.Brand} {car.Model} " + $"({car.Year}) - {car.DailyPrice} Ft/nap");
+        }
+    }
+
+    private void RentCar()
+    {
+        int carId = InputHelper.ReadInt("Autó ID: ");
+
+        try
+        {
+            bool rented = _rentalService.RentCar(carId);
+
+            Console.WriteLine(rented ? "Autó sikeresen kikölcsönözve." : "Nem található autó ezzel az azonosítóval.");
+        }
+        catch (InvalidOperationException ex)
+        {
+            Console.WriteLine($"Hiba: {ex.Message}");
+        }
+    }
+
+    private void ReturnCar()
+    {
+        int carId = InputHelper.ReadInt("Autó ID: ");
+
+        bool returned = _rentalService.ReturnCar(carId);
+
+        Console.WriteLine(returned ? "Autó sikeresen visszahozva." : "Nem található aktív kölcsönzés ezzel az autóazonosítóval.");
     }
 }
