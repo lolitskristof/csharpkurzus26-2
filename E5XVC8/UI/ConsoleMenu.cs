@@ -1,5 +1,5 @@
 using E5XVC8.Interfaces;
-
+using E5XVC8.Models;
 namespace E5XVC8.UI;
 
 public class ConsoleMenu
@@ -8,11 +8,14 @@ public class ConsoleMenu
     private readonly IRentalService _rentalService;
     private readonly ICarRepository _repository;
 
-    public ConsoleMenu(ICarService carService, IRentalService rentalService, ICarRepository repository)
+    private readonly CarRentalData _data;
+
+    public ConsoleMenu(ICarService carService, IRentalService rentalService, ICarRepository repository, CarRentalData data)
     {
         _carService = carService;
         _rentalService = rentalService;
         _repository = repository;
+        _data = data;
     }
 
     private static void ShowMenu()
@@ -44,6 +47,11 @@ public class ConsoleMenu
                 return;
             }
 
+            Console.WriteLine();
+            Console.ForegroundColor = ConsoleColor.Cyan;
+            Console.WriteLine("========== EREDMÉNY ==========");
+            Console.ResetColor();
+
             switch (choice)
             {
                 case 1:
@@ -67,11 +75,32 @@ public class ConsoleMenu
                 case 7:
                     ReturnCar();
                     break;
+                case 8:
+                    ListAvailableCars();
+                    break;
+                case 9:
+                    ListRentedCars();
+                    break;
 
                 default:
                     Console.WriteLine("A menüpont még nincs implementálva.");
                     break;
             }
+            if (choice is 1 or 2 or 6 or 7)
+            {
+                try
+                {
+                    _repository.Save(_data);
+                }
+                catch (InvalidOperationException ex)
+                {
+                    Console.WriteLine($"Mentési hiba: {ex.Message}");
+                }
+            }
+            Console.WriteLine("==============================");
+            Console.Write("\nNyomj Entert a folytatáshoz...");
+            Console.ReadLine();
+            Console.Clear();
         }
     }
 
@@ -184,5 +213,37 @@ public class ConsoleMenu
         bool returned = _rentalService.ReturnCar(carId);
 
         Console.WriteLine(returned ? "Autó sikeresen visszahozva." : "Nem található aktív kölcsönzés ezzel az autóazonosítóval.");
+    }
+
+    private void ListAvailableCars()
+    {
+        var cars = _rentalService.GetAvailableCars();
+
+        if (cars.Count == 0)
+        {
+            Console.WriteLine("Nincsenek elérhető autók.");
+            return;
+        }
+
+        foreach (var car in cars)
+        {
+            Console.WriteLine($"{car.Id} - {car.Brand} {car.Model} " + $"({car.Year}) - {car.DailyPrice} Ft/nap");
+        }
+    }
+
+    private void ListRentedCars()
+    {
+        var cars = _rentalService.GetRentedCars();
+
+        if (cars.Count == 0)
+        {
+            Console.WriteLine("Nincsenek kikölcsönzött autók.");
+            return;
+        }
+
+        foreach (var car in cars)
+        {
+            Console.WriteLine($"{car.Id} - {car.Brand} {car.Model} " + $"({car.Year}) - {car.DailyPrice} Ft/nap");
+        }
     }
 }

@@ -20,7 +20,7 @@ internal class Program
         ICarService carService = new CarService(data);
         IRentalService rentalService = new RentalService(data);
 
-        ConsoleMenu menu = new(carService, rentalService, repository);
+        ConsoleMenu menu = new(carService, rentalService, repository, data);
         menu.Run();
     }
 }
