@@ -86,6 +86,8 @@ public class ConsoleMenu
                     Console.WriteLine("A menüpont még nincs implementálva.");
                     break;
             }
+
+            // Az adatokat módosító műveletek után automatikusan mentünk.
             if (choice is 1 or 2 or 6 or 7)
             {
                 try
@@ -97,6 +99,7 @@ public class ConsoleMenu
                     Console.WriteLine($"Mentési hiba: {ex.Message}");
                 }
             }
+
             Console.WriteLine("==============================");
             Console.Write("\nNyomj Entert a folytatáshoz...");
             Console.ReadLine();

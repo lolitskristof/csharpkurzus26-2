@@ -15,6 +15,7 @@ internal class Program
 
         ICarRepository repository = new JsonCarRepository(filePath);
 
+        // Betöltjük az adatokat, majd átadjuk a service-eknek.
         CarRentalData data = repository.Load();
 
         ICarService carService = new CarService(data);

@@ -18,6 +18,7 @@ public class JsonCarRepository : ICarRepository
     {
         try
         {
+            // Első indításkor még nem létezik mentett adatfájl.
             if (!File.Exists(_filePath)) return new CarRentalData();
 
             string json = File.ReadAllText(_filePath);
@@ -34,6 +35,7 @@ public class JsonCarRepository : ICarRepository
     {
         try
         {
+            // Létrehozzuk az adatmappát, ha még nem létezik.
             string? directory = Path.GetDirectoryName(_filePath);
 
             if (!string.IsNullOrEmpty(directory)) Directory.CreateDirectory(directory);

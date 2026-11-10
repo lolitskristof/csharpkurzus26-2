@@ -19,6 +19,7 @@ public class CarService : ICarService
         if (year < 1886 || year > DateTime.Now.Year + 1)
             throw new ArgumentException("Érvénytelen évjárat");
 
+        // A legnagyobb meglévő azonosító alapján generálunk új ID-t.
         int nextId = _data.Cars.Count == 0 ? 1 : _data.Cars.Max(car => car.Id) + 1;
 
         Car car = new()
@@ -41,8 +42,8 @@ public class CarService : ICarService
 
         if (car is null) return false;
 
-        if (_data.Rentals.Any(rental => rental.CarId == carId && rental.ReturnedAt is null))
-            throw new InvalidOperationException("Kikölcsönzött autó nem törölhető");
+        // Aktív kölcsönzéssel rendelkező autót nem engedünk törölni.
+        if (_data.Rentals.Any(rental => rental.CarId == carId && rental.ReturnedAt is null)) throw new InvalidOperationException("Kikölcsönzött autó nem törölhető");
 
         return _data.Cars.Remove(car);
     }
