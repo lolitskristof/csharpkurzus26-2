@@ -44,7 +44,74 @@ public class ConsoleMenu
                 return;
             }
 
-            Console.WriteLine("A menüpont még nincs implementálva.");
+            switch (choice)
+            {
+                case 1:
+                    AddCar();
+                    break;
+                case 2:
+                    RemoveCar();
+                    break;
+                case 3:
+                    ListCars();
+                    break;
+
+                default:
+                    Console.WriteLine("A menüpont még nincs implementálva.");
+                    break;
+            }
+        }
+    }
+
+    private void ListCars()
+    {
+        var cars = _carService.GetAllCars();
+
+        if (cars.Count == 0)
+        {
+            Console.WriteLine("Nincsenek autók a rendszerben.");
+            return;
+        }
+
+        foreach (var car in cars)
+        {
+            Console.WriteLine(
+                $"{car.Id} - {car.Brand} {car.Model} " +
+                $"({car.Year}) - {car.DailyPrice} Ft/nap");
+        }
+    }
+
+    private void AddCar()
+    {
+        string brand = InputHelper.ReadString("Márka: ");
+        string model = InputHelper.ReadString("Típus: ");
+        int year = InputHelper.ReadInt("Évjárat: ");
+        decimal dailyPrice = InputHelper.ReadDecimal("Napi díj (Ft): ");
+
+        try
+        {
+            var car = _carService.AddCar(brand, model, year, dailyPrice);
+            Console.WriteLine($"Autó sikeresen hozzáadva! ID: {car.Id}");
+        }
+        catch (ArgumentException ex)
+        {
+            Console.WriteLine($"Hiba: {ex.Message}");
+        }
+    }
+
+    private void RemoveCar()
+    {
+        int carId = InputHelper.ReadInt("Autó ID: ");
+
+        try
+        {
+            bool removed = _carService.RemoveCar(carId);
+
+            Console.WriteLine(removed ? "Autó sikeresen törölve." : "Nem található autó ezzel az azonosítóval.");
+        }
+        catch (InvalidOperationException ex)
+        {
+            Console.WriteLine($"Hiba: {ex.Message}");
         }
     }
 }
